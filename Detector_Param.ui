@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>314</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>240</y>
+     <width>191</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radio_E">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>20</y>
+     <width>97</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Energy (keV)</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radio_W">
+   <property name="geometry">
+    <rect>
+     <x>145</x>
+     <y>20</y>
+     <width>126</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Wavelength (nm)</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsb_Energy">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>50</y>
+     <width>86</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="locale">
+    <locale language="English" country="Australia"/>
+   </property>
+   <property name="value">
+    <double>12.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsb_dist">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>185</y>
+     <width>81</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="locale">
+    <locale language="English" country="Australia"/>
+   </property>
+   <property name="maximum">
+    <double>1677000000.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>7000.010000000000218</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsb_x_beam">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>125</y>
+     <width>81</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="locale">
+    <locale language="English" country="Australia"/>
+   </property>
+   <property name="maximum">
+    <double>1677000000.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>512.340000000000032</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsb_y_beam">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>155</y>
+     <width>81</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="locale">
+    <locale language="English" country="Australia"/>
+   </property>
+   <property name="maximum">
+    <double>1677000000.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>511.110000000000014</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="e_label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>55</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>121</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Camera length (mm)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>95</x>
+     <y>130</y>
+     <width>56</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Beam X</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>95</x>
+     <y>165</y>
+     <width>56</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Beam Y</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsb_pixel1">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>90</y>
+     <width>86</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="locale">
+    <locale language="English" country="Australia"/>
+   </property>
+   <property name="maximum">
+    <double>1677000000.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>172.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>35</x>
+     <y>95</y>
+     <width>111</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pixel size (micron)</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
