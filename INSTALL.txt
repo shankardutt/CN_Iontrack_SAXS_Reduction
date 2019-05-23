@@ -1,0 +1,23 @@
+ubuntu 18.04 LTS
+install anaconda2
+conda install numpy=1.16.3
+conda install -c conda-forge fabio
+conda install scipy=1.2.1
+conda install matplotlib
+conda install PIL=1.1.7
+conda install -c conda-forge pyFAI=0.14
+
+
+new version
+install anaconda2
+conda install numpy=1.16.3
+conda install -c conda-forge fabio
+conda install scipy=1.2.1
+conda install matplotlib=2.2.3
+conda install PIL=1.1.7
+conda install -c conda-forge pyFAI=0.18.0
+conda install pyqt=5
+
+or
+install anaconda2
+conda env create -n <env-name> -f environment.yml
