@@ -193,8 +193,8 @@ def integrate_shell(options, args):
 
 #        abschi,chi1,I1,sig1 = do_integration1d_x(img,alpha,gamma,config,k,qpix,bs_mask)
         abschi,chi1,I1,sig1 = do_integration1d(img,alpha,gamma,config,k,qpix,bs_mask)
-        data = np.array(zip(chi1,I1,sig1))
-        np.savetxt(outpath+"_sig.xy", data, delimiter="\t")
+#        data = np.array(zip(chi1,I1,sig1))
+        np.savetxt(outpath+"_sig.xy", (chi1,I1,sig1), delimiter="\t")
         if options.bkg_angle:
             alpha+=float(config["bkg_angle"])
 #            abschi,chi2,I2,sig2 = do_integration1d_x(img,alpha,gamma,config,k,qpix,bs_mask)
@@ -202,10 +202,10 @@ def integrate_shell(options, args):
             I3=I1-I2
             sig3=sig1*sig1+sig2*sig2
             sig3=np.sqrt(sig3)
-            data = np.array(zip(chi2,I2,sig2))
-            np.savetxt(outpath+"_bkg.xy", data, delimiter="\t")
-            data = np.array(zip(chi2,I3,sig3))
-            np.savetxt(outpath+"_sub.xy", data, delimiter="\t")
+#            data = np.array(zip(chi2,I2,sig2))
+            np.savetxt(outpath+"_bkg.xy", (chi2,I2,sig2), delimiter="\t")
+#            data = np.array(zip(chi2,I3,sig3))
+            np.savetxt(outpath+"_sub.xy", (chi2,I3,sig3), delimiter="\t")
 #        if multiframe:
 #            writer = HDF5Writer(outpath + "_pyFAI.h5")
 #            writer.init(config)
