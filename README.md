@@ -1,2 +1,3 @@
 # CN_Iontrack_SAXS_Reduction
-Data reduction of 2D SAXS images
+
+A script that allows automated data reduction for Small Angle Scattering of ion tracks.
