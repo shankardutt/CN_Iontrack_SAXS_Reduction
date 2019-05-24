@@ -54,6 +54,9 @@ from beam_stop_mask import *
 
 import fabio
 
+if sys.version_info[0] >= 3:
+    unicode = str
+
 def get_ui_file_ITC(filename):
     """get the full path of a user-interface file
         
@@ -93,7 +96,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "dist": 1.0,
                         "energy": 12.0,
                         "c_max_s": 1000.0,
-                        "outpath": "subfolder",
+                        "outpath": "/",
                         "c_max": 1000.0,
                         "gamma_delta": 0,
                         "pixel2": 0.000172,
@@ -102,7 +105,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "radial_int": 20,
                         "c_min": 0.0,
                         "fit_thresh": 0.0,
-                        "bkg_angle": 0.0,
+                        "bkg_angle": 10.0,
                         "damping": 0.5,
                         "c_min_s": 0.0,
                         "exp_path": " ",
@@ -119,8 +122,8 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "file_path": " ",
                         "cmap": None,
                         "gamma_ini": 4.0,
-                        "Beam_x": 0,
-                        "Beam_y": 0,
+                        "Beam_x": 500,
+                        "Beam_y": 500,
                         "Bsc_size" : 16,
                         "Bs_alpha": 0,
                         "Bs_w2": 9,
@@ -129,17 +132,20 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "Bs_x_off": 0,
                         "Bs_y_off": 0
                     }
+        default_dict["file_path"] = os.path.join(os.getcwd(),'test_data','a-SiO2_01_0003.tif')
+        default_dict["outpath"] = os.path.join(os.getcwd(),'test_data_reduced')
+        
         ok=False
         if self.json_file is not None:
-            print "loading parameter ", self.json_file
+            print ("loading parameter ", self.json_file)
             ok=self.restore(self.json_file)
         if not ok:
-                print "loading default itcfit.json"
+                print ("loading default itcfit.json")
                 ok=self.restore(".itcfit.json")
         if not ok:
-            print "no file to load, using the default dict"
+            print ("no file to load, using the default dict")
             self.set_config(default_dict)
-        print "json_file: ", self.json_file
+        print ("json_file: ", self.json_file)
 
         ok=False
         if file_path_:
@@ -151,7 +157,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 if op.isfile(self.config["file_path"]):
                     self.file_path=self.config["file_path"]
                     ok=True
-        print "file_path: ",self.file_path
+        print ("file_path: ",self.file_path)
 
         ok=False
         self.exp_load=self.config["exp_load"]
@@ -167,7 +173,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         ok=True
         if not ok:
             self.exp_load=0
-        print "exp_path: ",self.exp_path
+        print ("exp_path: ",self.exp_path)
 
         self.k,self.qpix = qr_conv(self.config)
         self.phis=np.arange(0,6.3,0.01)
@@ -403,9 +409,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         while abs(alpha_corr) > fit_tol and i < max_iter:
             alpha_corr,gamma,k,qpix=fit_circ_pyFAI(img,gamma,alpha,fit_r_range,self.config,self.bs_mask)
             alpha+=alpha_corr*self.config['damping']
-            print "a=",alpha_corr
-            print "d=",self.config['damping']
-            print "i=",i
+            print ("a=",alpha_corr)
+            print ("d=",self.config['damping'])
+            print ("i=",i)
             i+=1
         
         alpha=alpha%360
@@ -516,7 +522,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.get_config()
         if self.sub_folder_cb.isChecked():
             self.outpath=self.sub_folder_path.text()
-            print "saveing to:", self.outpath
+            print ("saveing to:", self.outpath)
             if not os.path.isdir(self.outpath):#making the subfolder, if it doesn't exist
                 os.makedirs(self.outpath)
             alpha = float(self.dsb_alpha.text())
@@ -527,7 +533,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             basename=os.path.basename(self.file_path)
             np.savetxt(self.outpath+"/"+basename+"_sig.xy", data, delimiter="\t")
             if self.config["bkg_angle"]!=0:
-                print "bkg=",self.config["bkg_angle"]
+                print ("bkg=",self.config["bkg_angle"])
                 alpha+=float(self.config["bkg_angle"])
 #                abschi,chi2,I2,sig2 = do_integration1d_x(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
                 abschi,chi2,I2,sig2 = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
@@ -618,17 +624,17 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         to_save = self.get_config()
         if filename is None:
             filename = '.itcfit.json' #self.json_file
-        print "saving to: ",filename
+        print ("saving to: ",filename)
         if filename is not None:
 #            logger.info("Dump to %s", filename)
             try:
                 with open(filename, "w") as myFile:
                     json.dump(to_save, myFile, indent=4)
             except IOError as error:
-                print "Error while saving config: ", error
+                print ("Error while saving config: ", error)
 #                logger.error("Error while saving config: %s", error)
             else:
-                print "Saved"
+                print ("Saved")
 #                logger.debug("Saved")
         return to_save
 
@@ -650,7 +656,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             fig.canvas.draw()
     def subfolder_btn_handl(self):
         file_path=(qt.QFileDialog.getExistingDirectory(self, "Select Directory"))
-        print file_path
+        print (file_path)
         if file_path:
             self.outpath=file_path
             self.sub_folder_path.setText(self.outpath)
@@ -681,6 +687,8 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             if ok:
                 self.config=data
                 self.exp_path=None
+        if self.img_orig is None:
+            return
         self.img=np.copy(self.img_orig)
         self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=self.mask_file)
         #beam_stop_threshold_mask(self.img,self.img_orig.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),mask_file=self.mask_file)
