@@ -150,7 +150,10 @@ def do_integration1d(img,alpha,gamma,config,k,qpix,mask=None):
     #method="splitpixel"
 
     #res = ai._integrate2d_ng(img, rnpts, chinpts, unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,dummy=1,delta_dummy=2,mask=mask_img,error_model = "poisson")
-    res = ai._integrate2d_ng(img, rnpts, chinpts, unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson")
+    
+#    res = ai._integrate2d_ng(img, rnpts, chinpts, unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson")
+
+    res = ai._integrate2d_ng(img, rnpts, int(chinpts), unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson")
 
     
     I1 = res.intensity

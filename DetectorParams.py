@@ -78,7 +78,6 @@ class DetectorParams(QMainWindow, QDialog):
         self.buttonBox.accepted.connect(self.ok)
 
     def ok(self):
-        print "ok pressed"
         if self.radio_E.isChecked():
             self.energy=float(self.dsb_Energy.text())
         else:
@@ -110,8 +109,12 @@ class DetectorParams(QMainWindow, QDialog):
 
 if __name__ == '__main__':
     import sys
-    from PyQt4 import QtGui
-    app = QtGui.QApplication(sys.argv)
+    from PyQt5 import QtGui
+    from silx.gui import qt
+    
+#    app = QtGui.QApplication(sys.argv)
+    app = qt.QApplication(sys.argv)
+
     config={
             "energy":10.0,
             "dist":7.000,
@@ -123,7 +126,7 @@ if __name__ == '__main__':
     data,ok = DetectorParams.getParams(config)
     if ok:
         config=data
-    print config
+        print (config)
 #    date, time,ok = DateDialog.getDateTime()
     sys.exit(0)
     sys.exit(app.exec_())
