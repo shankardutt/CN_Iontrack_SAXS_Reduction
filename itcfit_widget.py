@@ -530,9 +530,11 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
 #            abschi,chi1,I1,sig1 = do_integration1d_x(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
             abschi,chi1,I1,sig1 = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
 #            chi1 = I1 = sig1 = np.arange(0.0,5.0,1.0)
-            data = np.array(zip(chi1,I1,sig1))
+#            data = np.array(zip(chi1,I1,sig1))
+            data = np.array([chi1,I1,sig1]).transpose()
+ 
             basename=os.path.basename(self.file_path)
-            np.savetxt(self.outpath+"/"+basename+"_sig.xy", data, delimiter="\t")
+            np.savetxt(self.outpath+"/"+basename+"_sig.xy", data, delimiter="\t",header="q\tI\tsig")
             if self.config["bkg_angle"]!=0:
                 print ("bkg=",self.config["bkg_angle"])
                 alpha+=float(self.config["bkg_angle"])
@@ -541,10 +543,13 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 I3=I1-I2
                 sig3=sig1*sig1+sig2*sig2
                 sig3=np.sqrt(sig3)
-                data = np.array(zip(chi2,I2,sig2))
-                np.savetxt(self.outpath+"/"+basename+"_bkg.xy", data, delimiter="\t")
-                data = np.array(zip(chi2,I3,sig3))
-                np.savetxt(self.outpath+"/"+basename+"_sub.xy", data, delimiter="\t")
+#                data = np.array(zip(chi2,I2,sig2))
+                data = np.array([chi2,I2,sig2]).transpose()
+                np.savetxt(self.outpath+"/"+basename+"_bkg.xy", data, delimiter="\t",header="q\tI\tsig")
+#                data = np.array(zip(chi2,I3,sig3))
+                data = np.array([chi2,I3,sig3]).transpose()
+                
+                np.savetxt(self.outpath+"/"+basename+"_sub.xy", data, delimiter="\t",header="q\tI\tsig")
         self.dump()
 #        self.dump("itcfit.json")
     def get_config(self):
