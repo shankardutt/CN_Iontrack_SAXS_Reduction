@@ -120,7 +120,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "qmax": 0.6,
                         "save_img": True,
                         "file_path": " ",
-                        "cmap": None,
+                        "cmap": "jet",
                         "gamma_ini": 4.0,
                         "Beam_x": 500,
                         "Beam_y": 500,
@@ -529,9 +529,10 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             gamma = float(self.dsb_gamma.text())
 #            abschi,chi1,I1,sig1 = do_integration1d_x(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
             abschi,chi1,I1,sig1 = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
-            data = np.array(zip(chi1,I1,sig1))
+#            chi1 = I1 = sig1 = np.arange(0.0,5.0,1.0)
+#            data = np.array(zip(chi1,I1,sig1))
             basename=os.path.basename(self.file_path)
-            np.savetxt(self.outpath+"/"+basename+"_sig.xy", data, delimiter="\t")
+            np.savetxt(self.outpath+"/"+basename+"_sig.xy", (chi1,I1,sig1), delimiter="\t")
             if self.config["bkg_angle"]!=0:
                 print ("bkg=",self.config["bkg_angle"])
                 alpha+=float(self.config["bkg_angle"])
@@ -540,10 +541,10 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 I3=I1-I2
                 sig3=sig1*sig1+sig2*sig2
                 sig3=np.sqrt(sig3)
-                data = np.array(zip(chi2,I2,sig2))
-                np.savetxt(self.outpath+"/"+basename+"_bkg.xy", data, delimiter="\t")
-                data = np.array(zip(chi2,I3,sig3))
-                np.savetxt(self.outpath+"/"+basename+"_sub.xy", data, delimiter="\t")
+#                data = np.array(zip(chi2,I2,sig2))
+                np.savetxt(self.outpath+"/"+basename+"_bkg.xy", (chi2,I2,sig2), delimiter="\t")
+#                data = np.array(zip(chi2,I3,sig3))
+                np.savetxt(self.outpath+"/"+basename+"_sub.xy", (chi2,I3,sig3), delimiter="\t")
         self.dump()
 #        self.dump("itcfit.json")
     def get_config(self):
