@@ -121,7 +121,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "save_img": True,
                         "file_path": " ",
                         "cmap": "jet",
-                        "gamma_ini": 3.9,
+                        "gamma_ini": 3.55,
                         "Beam_x": 587,
                         "Beam_y": 452,
                         "Bsc_size" : 16,
@@ -264,6 +264,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             x0=r*np.cos(np.radians(alpha))+x_beam
             y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
             self.circ1 = ax1f1.plot( *(xy)(r,self.phis,x0,y0), c='r',ls='-',zorder=2)
+            self.circ3 = ax1f1.plot( *(xy)(r+0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=4)
+            self.circ4 = ax1f1.plot( *(xy)(r-0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=5)
+            
             alpha+=float(self.dsb_bkg_angle.text())
             x0=r*np.cos(np.radians(alpha))+x_beam
             y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
@@ -307,6 +310,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 im=self.fig_dict['orig. image'][1]
                 self.subp.lines.pop(0)
                 self.subp.lines.pop(0)
+                self.subp.lines.pop(0)
+                self.subp.lines.pop(0)
+                
                 ax=self.subp.axis()
 #                if self.cb_logscale.isChecked():
 #                    im.set_norm(mpl.colors.LogNorm())
@@ -320,6 +326,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 x0=r*np.cos(np.radians(alpha))+x_beam
                 y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
                 self.circ1 = self.subp.plot( *(xy)(r,self.phis,x0,y0), c='r',ls='-',zorder=2)
+                self.circ3 = self.subp.plot( *(xy)(r+0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=4)
+                self.circ4 = self.subp.plot( *(xy)(r-0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=5)
+            
                 alpha+=float(self.dsb_bkg_angle.text())
                 x0=r*np.cos(np.radians(alpha))+x_beam
                 y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
@@ -530,9 +539,11 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
 #            abschi,chi1,I1,sig1 = do_integration1d_x(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
             abschi,chi1,I1,sig1 = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
 #            chi1 = I1 = sig1 = np.arange(0.0,5.0,1.0)
-            data = np.array(zip(chi1,I1,sig1))
+#            data = np.array(zip(chi1,I1,sig1))
+            data = np.array([chi1,I1,sig1]).transpose()
+ 
             basename=os.path.basename(self.file_path)
-            np.savetxt(self.outpath+"/"+basename+"_sig.xy", data, delimiter="\t")
+            np.savetxt(self.outpath+"/"+basename+"_sig.xy", data, delimiter="\t",header="q\tI\tsig")
             if self.config["bkg_angle"]!=0:
                 print ("bkg=",self.config["bkg_angle"])
                 alpha+=float(self.config["bkg_angle"])
@@ -541,10 +552,13 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 I3=I1-I2
                 sig3=sig1*sig1+sig2*sig2
                 sig3=np.sqrt(sig3)
-                data = np.array(zip(chi2,I2,sig2))
-                np.savetxt(self.outpath+"/"+basename+"_bkg.xy", data, delimiter="\t")
-                data = np.array(zip(chi2,I3,sig3))
-                np.savetxt(self.outpath+"/"+basename+"_sub.xy", data, delimiter="\t")
+#                data = np.array(zip(chi2,I2,sig2))
+                data = np.array([chi2,I2,sig2]).transpose()
+                np.savetxt(self.outpath+"/"+basename+"_bkg.xy", data, delimiter="\t",header="q\tI\tsig")
+#                data = np.array(zip(chi2,I3,sig3))
+                data = np.array([chi2,I3,sig3]).transpose()
+                
+                np.savetxt(self.outpath+"/"+basename+"_sub.xy", data, delimiter="\t",header="q\tI\tsig")
         self.dump()
 #        self.dump("itcfit.json")
     def get_config(self):
