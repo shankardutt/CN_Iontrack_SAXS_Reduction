@@ -121,7 +121,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "save_img": True,
                         "file_path": " ",
                         "cmap": "jet",
-                        "gamma_ini": 3.9,
+                        "gamma_ini": 3.55,
                         "Beam_x": 587,
                         "Beam_y": 452,
                         "Bsc_size" : 16,
@@ -264,6 +264,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             x0=r*np.cos(np.radians(alpha))+x_beam
             y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
             self.circ1 = ax1f1.plot( *(xy)(r,self.phis,x0,y0), c='r',ls='-',zorder=2)
+            self.circ3 = ax1f1.plot( *(xy)(r+0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=4)
+            self.circ4 = ax1f1.plot( *(xy)(r-0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=5)
+            
             alpha+=float(self.dsb_bkg_angle.text())
             x0=r*np.cos(np.radians(alpha))+x_beam
             y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
@@ -307,6 +310,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 im=self.fig_dict['orig. image'][1]
                 self.subp.lines.pop(0)
                 self.subp.lines.pop(0)
+                self.subp.lines.pop(0)
+                self.subp.lines.pop(0)
+                
                 ax=self.subp.axis()
 #                if self.cb_logscale.isChecked():
 #                    im.set_norm(mpl.colors.LogNorm())
@@ -320,6 +326,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 x0=r*np.cos(np.radians(alpha))+x_beam
                 y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
                 self.circ1 = self.subp.plot( *(xy)(r,self.phis,x0,y0), c='r',ls='-',zorder=2)
+                self.circ3 = self.subp.plot( *(xy)(r+0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=4)
+                self.circ4 = self.subp.plot( *(xy)(r-0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=5)
+            
                 alpha+=float(self.dsb_bkg_angle.text())
                 x0=r*np.cos(np.radians(alpha))+x_beam
                 y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
