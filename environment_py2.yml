@@ -1,4 +1,4 @@
-name: test_env_CN
+name: Iontrack_SAXS_reduction
 channels:
   - conda-forge
   - defaults

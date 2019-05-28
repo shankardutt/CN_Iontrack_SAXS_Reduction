@@ -1,6 +1,7 @@
-ubuntu 18.04 LTS
+ubuntu 18.04 LTS & macOS 10.14.5
 
-install anaconda2
+install anaconda2 or anaconda3
+
 conda install numpy=1.16.3
 conda install -c conda-forge fabio
 conda install scipy=1.2.1
@@ -9,7 +10,12 @@ conda install PIL=1.1.7
 conda install -c conda-forge pyFAI=0.18.0
 conda install pyqt=5
 
-or
+or (doesn't work on macOS)
 
 install anaconda2
-conda env create -n <env-name> -f environment.yml
+
+for python 2 use:
+conda env create -n <env-name> -f environment_py2.yml
+
+for python 3 use:
+conda env create -n <env-name> -f environment_py3.yml

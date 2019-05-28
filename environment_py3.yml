@@ -1,4 +1,4 @@
-name: py3_test
+name: Iontrack_SAXS_reduction
 channels:
   - conda-forge
   - defaults
