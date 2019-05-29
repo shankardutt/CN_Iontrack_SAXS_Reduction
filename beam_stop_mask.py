@@ -58,7 +58,7 @@ def beam_stop_threshold_mask(img,maxValue,minValue,x_beam,y_beam,bsc_size,bs_alp
     im_w,im_h = img.shape
     row, col = np.ogrid[:im_w, :im_h]
 
-    disk_mask = ((col - x_beam)**2 + (row - im_w + y_beam)**2 < (bsc_size)**2)
+    disk_mask = ((col - x_beam)**2 + (row - y_beam)**2 < (bsc_size)**2)
     selectionMask[disk_mask]=1
 
     e_x1=np.cos(np.radians(bs_alpha))
@@ -68,12 +68,12 @@ def beam_stop_threshold_mask(img,maxValue,minValue,x_beam,y_beam,bsc_size,bs_alp
 
     bs_w1=bsc_size #center_mask
 
-    x0=(bs_w1*e_x1+x_beam,bs_w1*e_x2+(im_w-y_beam))
+    x0=(bs_w1*e_x1+x_beam,bs_w1*e_x2+(y_beam))
     x1=((bs_w2-bs_w1)*e_x1+x0[0]+bs_l1*e_y1,(bs_w2-bs_w1)*e_x2+bs_l1*e_y2+x0[1])
     x2=(x1[0]+e_y1*bs_l2,x1[1]+e_y2*bs_l2)
     x3=(x2[0]-e_x1*2*bs_w2,x2[1]-e_x2*2*bs_w2)
     x4=(x3[0]-bs_l2*e_y1,x3[1]-bs_l2*e_y2)
-    x5=(-bs_w1*e_x1+x_beam,-bs_w1*e_x2+(im_w-y_beam))
+    x5=(-bs_w1*e_x1+x_beam,-bs_w1*e_x2+(y_beam))
 
     poly_verts1 = [x0,x1,x2,x3,x4,x5]
 

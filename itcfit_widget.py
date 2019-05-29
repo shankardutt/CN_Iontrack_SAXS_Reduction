@@ -179,6 +179,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.phis=np.arange(0,6.3,0.01)
 
         self.exp_cb.addItem("ScatterBrain")
+        self.exp_cb.addItem("pyFAI")
         self.exp_cb.currentIndexChanged.connect(self.exp_cb_change)
         self.cb_logscale.setChecked(True)
         self.cb_logscale.stateChanged.connect(self.update_view)
@@ -256,20 +257,20 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             ax=ax1f1.axis()
             im_w,im_h=self.img.shape
             x_beam=self.config["Beam_x"]#+0.5
-            y_beam=self.config["Beam_y"]#+0.5
+            y_beam=float(self.config["Beam_y"])#+0.5
             k=self.k
             alpha = float(self.dsb_alpha.text())
             gamma = float(self.dsb_gamma.text())
             r =k*np.tan(np.radians(gamma))
             x0=r*np.cos(np.radians(alpha))+x_beam
-            y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
+            y0=r*np.sin(-np.radians(alpha))+y_beam
             self.circ1 = ax1f1.plot( *(xy)(r,self.phis,x0,y0), c='r',ls='-',zorder=2)
             self.circ3 = ax1f1.plot( *(xy)(r+0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=4)
             self.circ4 = ax1f1.plot( *(xy)(r-0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=5)
             
             alpha+=float(self.dsb_bkg_angle.text())
             x0=r*np.cos(np.radians(alpha))+x_beam
-            y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
+            y0=r*np.sin(-np.radians(alpha))+y_beam
             self.circ2 = ax1f1.plot( *(xy)(r,self.phis,x0,y0), c='g',ls='-',zorder=3)
             ax1f1.axis(ax)
             self.addfig('orig. image', [fig1,im1,float(self.config["c_max"]),float(self.config["c_min"]),float(self.config["c_max_s"]),float(self.config["c_min_s"])])
@@ -308,12 +309,17 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 gamma = float(self.dsb_gamma.text())
                 fig=self.fig_dict['orig. image'][0]
                 im=self.fig_dict['orig. image'][1]
+#                print(im.get_extent())
+#                print(self.img.shape)
+#                im.set_extent((-0.5,self.img.shape[1]-0.5,self.img.shape[0]-0.5,-0.5))
+#                print(im.get_extent())
                 self.subp.lines.pop(0)
                 self.subp.lines.pop(0)
                 self.subp.lines.pop(0)
                 self.subp.lines.pop(0)
                 
                 ax=self.subp.axis()
+                
 #                if self.cb_logscale.isChecked():
 #                    im.set_norm(mpl.colors.LogNorm())
 #                else:
@@ -324,14 +330,14 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 k=self.k
                 r =k*np.tan(np.radians(gamma))
                 x0=r*np.cos(np.radians(alpha))+x_beam
-                y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
+                y0=r*np.sin(-np.radians(alpha))+y_beam
                 self.circ1 = self.subp.plot( *(xy)(r,self.phis,x0,y0), c='r',ls='-',zorder=2)
                 self.circ3 = self.subp.plot( *(xy)(r+0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=4)
                 self.circ4 = self.subp.plot( *(xy)(r-0.5*int(self.dsb_radial_int.text()),self.phis,x0,y0), c='r',ls='-',zorder=5)
             
                 alpha+=float(self.dsb_bkg_angle.text())
                 x0=r*np.cos(np.radians(alpha))+x_beam
-                y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
+                y0=r*np.sin(-np.radians(alpha))+y_beam
                 self.circ2 = self.subp.plot( *(xy)(r,self.phis,x0,y0), c='g',ls='-',zorder=3)
                 self.subp.axis(ax)
                 if fig.canvas:
@@ -393,18 +399,24 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 self.img[self.bs_mask > 0]=0
                 if self.active_fig is not None:
                     self.fig_dict['orig. image'][1].set_data(self.img)
+                    self.fig_dict['orig. image'][0].gca().set_autoscale_on(True)
+                    self.fig_dict['orig. image'][1].set_extent((-0.5,self.img.shape[1]-0.5,self.img.shape[0]-0.5,-0.5))
+#                    self.fig_dict['orig. image'][0].gca().set_autoscale_on(False)
             self.update_view()
         self.qfile_path.setText(self.file_path)
+        
     def file_path_btn_handl(self):
         file_path,_=(qt.QFileDialog.getOpenFileName())
         if file_path:
             self.load_img(file_path)
+            
     def qfile_path_handl(self):
         self.load_img(str_(self.qfile_path.text()))
 #            self.update_1d(img)
 #            self.mplfigs.setCurrentRow(0)
 #            item=self.mplfigs.selectedItems()[0]
 #            self.changefig(item)
+
     def fit_it_btn_handl(self):
         self.get_config()
         alpha_corr=100
@@ -428,6 +440,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             alpha+=360
         self.dsb_alpha.setValue(alpha)
         self.update_view()
+        
     def sub_folder_cb_handl(self):
         if self.sub_folder_cb.isChecked():
             self.sub_folder_path.setEnabled(True)
@@ -435,8 +448,10 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         else:
             self.sub_folder_path.setEnabled(False)
             self.subfolder_btn.setEnabled(False)
+            
     def exp_load_set(self,a):
         self.exp_load=int(a)
+        
     def set_config(self, dico):
         """Setup the widget from its description
             
@@ -504,6 +519,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         for key, value in setup_data.items():
             if key in dico and (value is not None):
                 value(dico[key])
+                
     def restore(self,filename):
         """Restore from JSON file the status of the current widget
             
@@ -517,6 +533,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         data = json.load(open(filename))
         self.set_config(data)
         return True
+    
     def save_as_config(self):
 #        logger.debug("save_config")
         self.get_config()
@@ -527,6 +544,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             self.json_file=json_file
             self.dump(json_file)
             self.dump(".itcfit.json")
+            
     def save_config(self):
         self.get_config()
         if self.sub_folder_cb.isChecked():
@@ -561,6 +579,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 np.savetxt(self.outpath+"/"+basename+"_sub.xy", data, delimiter="\t",header="q\tI\tsig")
         self.dump()
 #        self.dump("itcfit.json")
+
     def get_config(self):
         """Read the configuration of the plugin and returns it as a dictionary
             
@@ -628,6 +647,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
 #                "do_OpenCL": bool(self.do_OpenCL.isChecked())
 #                }
         return self.config
+    
     def dump(self, filename=None):
         """
         Dump the status of the current widget to a file in JSON
@@ -691,8 +711,13 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
 
     def exp_btn_handl(self):
         if self.exp_cb.currentIndex() != 0:
-            exp_path,_ = (qt.QFileDialog.getOpenFileName(caption="Open Experiment configuration",
+            if self.exp_cb.currentIndex() == 1:
+                exp_path,_ = (qt.QFileDialog.getOpenFileName(caption="Open Experiment configuration",
                                                            filter="Config (*.xml)"))#str_(qt.QFileDialog.getOpenFileName())
+            if self.exp_cb.currentIndex() == 2:
+                exp_path,_ = (qt.QFileDialog.getOpenFileName(caption="Open Experiment configuration",
+                                                             filter="Config (*.poni)"))#str_(qt.QFileDialog.getOpenFileName())
+            
             if exp_path:
                 self.last_exp_path=self.exp_path
                 self.load_exp(exp_path)

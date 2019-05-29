@@ -79,12 +79,12 @@ def do_integration1d_x(img,alpha,gamma,config,k,qpix,mask=None):
     width=config["radial_int"]
 
     row, col = np.ogrid[:im_w, :im_h]
-    disk_mask = ((col - (x_beam+x0))**2 + (row - im_w + (y_beam+y0))**2 < (d0-width*0.5)**2)
+    disk_mask = ((col - (x_beam+x0))**2 + (row - (y_beam+y0))**2 < (d0-width*0.5)**2)
     mask_img[disk_mask] = 1
-    disk_mask = ((col - (x_beam+x0))**2 + (row - im_w + (y_beam+y0))**2 > (d0+width*0.5)**2)
+    disk_mask = ((col - (x_beam+x0))**2 + (row - (y_beam+y0))**2 > (d0+width*0.5)**2)
     mask_img[disk_mask] = 1
 
-    p1=(im_w-(y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
+    p1=((y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
     p2=(x_beam)*config["pixel1"] #point of normal incidenc at the detector in meter
 
     ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(dist=config["dist"], pixel1=config["pixel1"], pixel2=config["pixel2"],poni1=p1,poni2=p2)
@@ -125,7 +125,7 @@ def do_integration1d(img,alpha,gamma,config,k,qpix,mask=None):
     x0=d0*np.cos(np.radians(alpha))
     y0=d0*np.sin(np.radians(alpha))
 
-    p1=(im_w-(y0+y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
+    p1=(y_beam-y0)*config["pixel1"] # point of normal incidenc at the detector in meter
     p2=(x0+x_beam)*config["pixel1"] #point of normal incidenc at the detector in meter
     d0=d0*config["pixel1"]*1e+3 # radius of the streak circle in mm
         
@@ -216,7 +216,7 @@ def fit_circ_pyFAI(img,gamma,alpha,width,config,mask_img=None):
 
     im_w,im_h=img.shape
     
-    p1=(im_w-(y0+y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
+    p1=((y0+y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
     p2=(x0+x_beam)*config["pixel1"] #point of normal incidenc at the detector in meter
     d0=d0*config["pixel1"]*1e+3 # radius of the streak circle in mm
 
@@ -314,7 +314,7 @@ def show_2D_cake(img,gamma,alpha,width,config):
 
     im_w,im_h=img.shape
     
-    p1=(im_w-(y0+y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
+    p1=((y0+y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
     p2=(x0+x_beam)*config["pixel1"] #point of normal incidenc at the detector in meter
     d0=d0*config["pixel1"]*1e+3 # radius of the streak circle in mm
     

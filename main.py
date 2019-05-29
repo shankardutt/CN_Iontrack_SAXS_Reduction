@@ -172,7 +172,7 @@ def integrate_shell(options, args):
             im=np.copy(img)
             r =k*np.tan(np.radians(gamma))
             x0=r*np.cos(np.radians(alpha))+x_beam
-            y0=r*np.sin(-np.radians(alpha))+im_w-y_beam
+            y0=r*np.sin(-np.radians(alpha))+y_beam
             phis=np.arange(0,6.3,0.01)
 #            cmap= cm.get_cmap(config['cmap'])
 #            min=config["c_min_s"]
