@@ -72,8 +72,7 @@ class pyFAIRead:
         self.dictionary["Beam_x"]=float(poniFile.poni2)/float(dictionary["pixel2"])
         self.dictionary["Beam_y"]=float(poniFile.poni1)/float(dictionary["pixel1"])
         self.dictionary["energy"]=12.3984/(float(poniFile.wavelength)*1e10)
-        print(float(poniFile.wavelength))
-        print(self.dictionary["energy"])
+
      def get_experiment(self):
         return self.dictionary
 
