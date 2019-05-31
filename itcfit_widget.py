@@ -372,7 +372,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                     pchi=chi
                     pI=I1d-I2d
                     pI_err=I1d*0
-                ax1 = fig.add_subplot(111)
+                #ax1 = fig.add_subplot(111)
+                ax1 = fig.gca()
+                
                 ax1.lines.pop(0)
                 #                ax1.plot(pchi,np.power(pI,0.2),c='b')
                 ax1.plot(pchi,pI,c='b')
