@@ -34,6 +34,7 @@ __status__ = "development"
 import numpy as np
 
 import pyFAI, pyFAI.azimuthalIntegrator
+from pyFAI.method_registry import IntegrationMethod
 
 pyFAI.use_opencl = False
 
@@ -60,7 +61,8 @@ def qr_conv(config):
 def do_integration1d_x(img,alpha,gamma,config,k,qpix,mask=None):
     #    mask_img = np.array(Image.open("./SAXS_masks.tiff"))
     mask_img = np.zeros(img.shape,dtype=np.uint8)
-    mask_img[mask] = 1
+    if mask is not None:
+        mask_img[mask>0] = 1
 #    mask_img = mask
 
     rnpts=1
@@ -74,16 +76,18 @@ def do_integration1d_x(img,alpha,gamma,config,k,qpix,mask=None):
     kx=qpix*0.5
 
     x0=d0*np.cos(np.radians(alpha))
-    y0=d0*np.sin(np.radians(alpha))
+    y0=d0*np.sin(np.radians(-alpha))
 
     width=config["radial_int"]
 
     row, col = np.ogrid[:im_w, :im_h]
-    disk_mask = ((col - (x_beam+x0))**2 + (row - (y_beam+y0))**2 < (d0-width*0.5)**2)
+    disk_mask = ((col - (x_beam+x0))**2 + (row - (y0+y_beam))**2 < (d0-width*0.5)**2)
     mask_img[disk_mask] = 1
-    disk_mask = ((col - (x_beam+x0))**2 + (row - (y_beam+y0))**2 > (d0+width*0.5)**2)
+    disk_mask = ((col - (x_beam+x0))**2 + (row - (y0+y_beam))**2 > (d0+width*0.5)**2)
     mask_img[disk_mask] = 1
-
+    
+    #plt.imshow(mask_img)
+    #plt.show()
     p1=((y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
     p2=(x_beam)*config["pixel1"] #point of normal incidenc at the detector in meter
 
@@ -98,13 +102,17 @@ def do_integration1d_x(img,alpha,gamma,config,k,qpix,mask=None):
 
     chinpts=np.floor((qmax/kx-1)*1.0)+1
 
-    chi1,I1,sig = ai.integrate1d(img, chinpts, unit="q_nm^-1",method=method, radial_range=(kx*1e-9,qmax*1e-9),correctSolidAngle=True,dummy=1,delta_dummy=2,mask=mask_img,error_model='poisson')
+    chi1,I1,sig = ai.integrate1d(img, chinpts, unit="q_nm^-1",method=method, radial_range=(kx*1e-9,qmax*1e-9),correctSolidAngle=True,dummy=-1,delta_dummy=2,mask=mask_img,error_model='poisson')
 
     return chi1,chi1,I1,sig
 
 def do_integration1d(img,alpha,gamma,config,k,qpix,mask=None):
 #    mask_img = np.array(Image.open("./SAXS_masks.tiff"))
-    mask_img = mask
+#    mask_img = mask
+    mask_img = np.zeros(img.shape,dtype=np.uint8)
+    if mask is not None:
+        mask_img[mask>0] = 1
+
     rnpts=1
     chinpts=500
     alpha=alpha%360
@@ -146,16 +154,18 @@ def do_integration1d(img,alpha,gamma,config,k,qpix,mask=None):
     amin=(alpha0-dalpha)
     amax=(alpha0+dalpha)
 
-    #method="bbox"
+    method="bbox"
     #method="splitpixel"
-
+#    method=IntegrationMethod.select_one_available("no", dim=2)
+#    print(method)
+#    sys.exit(0)
     #res = ai._integrate2d_ng(img, rnpts, chinpts, unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,dummy=1,delta_dummy=2,mask=mask_img,error_model = "poisson")
     
 #    res = ai._integrate2d_ng(img, rnpts, chinpts, unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson")
 
-    res = ai._integrate2d_ng(img, rnpts, int(chinpts), unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson")
+#    res = ai._integrate2d_ng(img, rnpts, int(chinpts), unit="r_mm",method="bbox",radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson")
+    res = ai._integrate2d_ng(img, rnpts, int(chinpts), unit="r_mm",method=method,radial_range=(d0-width*0.5,d0+width*0.5),azimuth_range=(amin,amax),correctSolidAngle=False,mask=mask_img,error_model = "poisson",dummy=-1)
 
-    
     I1 = res.intensity
     tth1 = res.radial
     chi1 = res.azimuthal

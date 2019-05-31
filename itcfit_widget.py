@@ -123,7 +123,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                         "cmap": "jet",
                         "gamma_ini": 3.55,
                         "Beam_x": 587,
-                        "Beam_y": 452,
+                        "Beam_y": 591,
                         "Bsc_size" : 16,
                         "Bs_alpha": -59.5,
                         "Bs_w2": 9,
@@ -134,7 +134,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                     }
         default_dict["file_path"] = os.path.join(os.getcwd(),'test_data','a-SiO2_01_0003.tif')
         default_dict["outpath"] = os.path.join(os.getcwd(),'test_data_reduced')
-        
+
         ok=False
         if self.json_file is not None:
             print ("loading parameter ", self.json_file)
@@ -280,8 +280,10 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 im5=ax1f5.imshow(self.img,zorder=1)
                 self.addfig('cake', [fig5,im5,float(self.config["c_max"]),float(self.config["c_min"]),float(self.config["c_max_s"]),float(self.config["c_min_s"])])
             abschi,chi,I1d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+            I1d[I1d<0]=1
             alpha+=float(self.dsb_bkg_angle.text())
             abschi2,chi2,I2d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+            I2d[I2d<0]=1
             fig2= Figure()
             ax1f2 = fig2.add_subplot(111)
             ax1f2.plot(chi,np.power(I1d,0.2))
@@ -349,6 +351,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 if self.active_fig == '1d reduced':
                     fig = self.fig_dict['1d reduced'][0]
                     abschi,chi,I1d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+                    I1d[I1d<=0]=1
                     pchi=chi
                     pI=I1d
                     pI_err=I1d*0
@@ -356,13 +359,16 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                     fig = self.fig_dict['1d reduced |q|'][0]
 #                    abschi,chi,I1d,pI_err = do_integration1d_x(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
                     abschi,chi,I1d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+                    I1d[I1d<=0]=1
                     pchi=abschi
                     pI=I1d
                 elif self.active_fig == '1d sub':
                     fig = self.fig_dict['1d sub'][0]
                     abschi,chi,I1d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+                    I1d[I1d<=0]=1
                     alpha+=float(self.dsb_bkg_angle.text())
                     abschi,chi,I2d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+                    I2d[I2d<=0]=1
                     pchi=chi
                     pI=I1d-I2d
                     pI_err=I1d*0
