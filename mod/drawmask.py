@@ -59,13 +59,10 @@ class AbstractMaskImageWidget(qt.QMainWindow,qt.QDialog):
     def __init__(self,parent=None):
         super(AbstractMaskImageWidget,self).__init__(parent)
         self.parent=parent
-#class dummy(qt.QMainWindow,qt.QDialog):
-#    def __init__(self):
-#        qt.QMainWindow.__init__(self)
         self.setWindowTitle("pyFAI drawmask")
         self.__outputFile = None
 
-        self._saveAndClose = qt.QPushButton("Save mask and quit")
+        self._saveAndClose = qt.QPushButton("Apply mask and quit")
         self._saveAndClose.clicked.connect(self.saveAndClose)
         self._saveAndClose.setMinimumHeight(50)
 
@@ -75,31 +72,17 @@ class AbstractMaskImageWidget(qt.QMainWindow,qt.QDialog):
     def saveAndClose(self):
         mask = self.getSelectionMask()
         self.parent.set_mask(mask)
-#        fabio.edfimage.edfimage(data=mask).write(self.__outputFile)
-#        print("Mask-file saved into %s" % (self.__outputFile))
         self.close()
 
 
 class MaskImageWidget(AbstractMaskImageWidget,qt.QDialog):
-#class MaskImageWidget(qt.QMainWindow,qt.QDialog):
+    """
+    Window application which allow to create a mask manually.
+    It is based on Silx library widgets.
+    """
+
     def __init__(self,parent=None):
         super(MaskImageWidget,self).__init__(parent)
-        
-#    @staticmethod
-#    def runx(img,parent=None):
-#        dia = MaskImageWidget(parent)
-#        dia.show()
-#        res = dia.exec_()
-#        return dia
-#       
-#class MaskImageWidget_1(AbstractMaskImageWidget):
-#    """
-#    Window application which allow to create a mask manually.
-#    It is based on Silx library widgets.
-#    """
-#    def __init__(self):
-#        AbstractMaskImageWidget.__init__(self)
-#
         self.__plot2D = silx.gui.plot.Plot2D()
         self.__plot2D.setKeepDataAspectRatio(True)
         maskAction = self.__plot2D.getMaskAction()
@@ -107,7 +90,7 @@ class MaskImageWidget(AbstractMaskImageWidget,qt.QDialog):
         self.__maskPanel = silx.gui.plot.MaskToolsWidget.MaskToolsWidget(plot=self.__plot2D)
         try:
             colormap = {
-                'name': "inferno",
+                'name': "jet",
                 'normalization': 'log',
                 'autoscale': True,
                 'vmax': None,
@@ -149,20 +132,7 @@ class MaskImageWidget(AbstractMaskImageWidget,qt.QDialog):
         dia.setImageData(img)
         dia.setWindowModality(qt.Qt.ApplicationModal)
         dia.show()
-#        res = dia.exec_()
         return dia
-
-def postProcessId21(processFile, mask):
-    """
-    Post process asked by Marine Cotte (ID21)
-
-    TODO: Remove it outside if it is possible. Ask them if it is still used.
-    """
-    print("Selected %i datapoints on file %s" % (mask.sum(), processFile[0]))
-    for datafile in processFile:
-        data = fabio.open(datafile).data[numpy.where(mask)]
-        print("On File: %s,\t mean= %s \t std= %s" % (datafile, data.mean(), data.std()))
-
 
 def main():
     usage = "pyFAI-drawmask file1.edf file2.edf ..."
@@ -202,7 +172,6 @@ def main():
     app.exec_()
 
     mask = window.getSelectionMask()
-    postProcessId21(processFile, mask)
 
 
 if __name__ == "__main__":
