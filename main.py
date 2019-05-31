@@ -29,11 +29,11 @@ __author__ = "Christian Notthoff, Patrick Kluth"
 __contact__ = "christian.notthoff@anu.edu.au"
 __license__ = "GPLv3+"
 __copyright__ = "Australian National University, Canberra, Australia"
-__date__ = "23/05/2019"
+__date__ = "31/05/2019"
 __status__ = "development"
 
-pyITCfit_version = "0.4.0"
-pyITCfit_date = "23/05/2019"
+pyITCfit_version = "0.5.0"
+pyITCfit_date = "31/05/2019"
 
 import sys, logging, json, os, time, types, threading
 import os.path
