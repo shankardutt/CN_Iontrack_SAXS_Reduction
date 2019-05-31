@@ -39,6 +39,8 @@ from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanva
 from silx.gui import qt
 from pyFAI.utils import float_, int_, str_, get_ui_file
 
+from mod.drawmask import *
+
 import os,sys
 import os.path as op
 import numpy as np
@@ -190,6 +192,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.dsb_qmax.editingFinished.connect(self.update_view)
         self.dsb_radial_int.editingFinished.connect(self.update_view)
         self.exp_btn.pressed.connect(self.exp_btn_handl)
+        self.mask_btn.pressed.connect(self.mask_btn_handl)
         self.subfolder_btn.pressed.connect(self.subfolder_btn_handl)
         self.file_path_btn.pressed.connect(self.file_path_btn_handl)
         self.fit_it_btn.pressed.connect(self.fit_it_btn_handl)
@@ -716,6 +719,21 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             self.img[self.bs_mask > 0]=0
             if self.active_fig is not None:
                 self.fig_dict['orig. image'][1].set_data(self.img)
+
+    def mask_btn_handl(self):
+        if self.img_orig is not None:
+            window = MaskImageWidget.runx(self.img_orig,self)
+
+    def set_mask(self,mask):
+        self.pyFAI_mask = np.copy(mask)
+        if self.img_orig is not None:
+            self.img=np.copy(self.img_orig)
+            self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=None,pyFAI_mask=self.pyFAI_mask)
+
+            self.img[self.bs_mask > 0]=0
+            if self.active_fig is not None:
+                self.fig_dict['orig. image'][1].set_data(self.img)
+        self.update_view()
 
     def exp_btn_handl(self):
         if self.exp_cb.currentIndex() != 0:

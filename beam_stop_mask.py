@@ -38,11 +38,13 @@ import sys
 
 from PIL import Image
 
-def beam_stop_threshold_mask(img,maxValue,minValue,x_beam,y_beam,bsc_size,bs_alpha,bs_w2,bs_l1,bs_l2,bs_x_off,bs_y_off,mask_file=None):
+def beam_stop_threshold_mask(img,maxValue,minValue,x_beam,y_beam,bsc_size,bs_alpha,bs_w2,bs_l1,bs_l2,bs_x_off,bs_y_off,mask_file=None,pyFAI_mask=None):
     if mask_file:
         mask = np.array(Image.open(mask_file))
     else:
         mask = None
+    if pyFAI_mask is not None:
+        mask = pyFAI_mask
     selectionMask = np.zeros(img.shape,dtype=np.uint8)
     tmpData = np.array(img, copy=True)
 #    tmpData[True - np.isfinite(img)] = maxValue
@@ -91,6 +93,8 @@ def beam_stop_threshold_mask(img,maxValue,minValue,x_beam,y_beam,bsc_size,bs_alp
     selectionMask[grid > 0]=1
     if mask_file:
         selectionMask[mask > 0]=1
+    if pyFAI_mask is not None:
+        selectionMask[pyFAI_mask > 0]=1
     return selectionMask
 
 if __name__ == "__main__":
