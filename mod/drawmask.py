@@ -136,7 +136,7 @@ class MaskImageWidget(AbstractMaskImageWidget,qt.QDialog):
 
 def main():
     usage = "pyFAI-drawmask file1.edf file2.edf ..."
-    version = "pyFAI-average version %s from %s" % (pyFAI.version, pyFAI.date)
+    version = "pyFAI-drawmask-mod version %s from %s" % (pyFAI.version, pyFAI.date)
     description = """
     Draw a mask, i.e. an image containing the list of pixels which are considered invalid
     (no scintillator, module gap, beam stop shadow, ...).
