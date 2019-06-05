@@ -49,8 +49,8 @@ def beam_stop_threshold_mask(img,maxValue,minValue,x_beam,y_beam,bsc_size,bs_alp
     tmpData = np.array(img, copy=True)
 #    tmpData[True - np.isfinite(img)] = maxValue
     tmpData[np.logical_not(np.isfinite(img))] = maxValue
-    selectionMask[tmpData >= maxValue] = 1
-    selectionMask[tmpData <= minValue] = 1
+    selectionMask[tmpData > maxValue] = 1
+    selectionMask[tmpData < minValue] = 1
 
     x_beam=np.copy(x_beam)
     y_beam=np.copy(y_beam)
