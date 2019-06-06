@@ -226,7 +226,7 @@ def fit_circ_pyFAI(img,gamma,alpha,width,config,mask_img=None):
 
     im_w,im_h=img.shape
     
-    p1=((y0+y_beam))*config["pixel1"] # point of normal incidenc at the detector in meter
+    p1=((y_beam-y0))*config["pixel1"] # point of normal incidenc at the detector in meter
     p2=(x0+x_beam)*config["pixel1"] #point of normal incidenc at the detector in meter
     d0=d0*config["pixel1"]*1e+3 # radius of the streak circle in mm
 
@@ -282,7 +282,7 @@ def fit_circ_pyFAI(img,gamma,alpha,width,config,mask_img=None):
 # Constrain the optimization to the region of ``0 < a < 3``, ``0 < b < 2`` and ``0 < c < 1``:
 #popt, pcov = curve_fit(func, xdata, ydata, bounds=(0, [3., 2., 1.]))
     popt, pcov = curve_fit(func_lin, dy, dx)
-
+    print(np.degrees(popt[0]))
     return np.degrees(np.arcsin(popt[0])),gamma,k,qpix
 
 
