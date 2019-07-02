@@ -776,9 +776,13 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         if self.active_fig:
             max=float(self.slider_max.value())
             min=float(self.slider_min.value())
-            self.fig_dict[self.active_fig][4]=max
-            self.fig_dict[self.active_fig][5]=min
-            self.fig_dict[self.active_fig][1].set_clim([min,max])
+            #print(self.active_fig)
+            #self.fig_dict[self.active_fig][4]=max
+            #self.fig_dict[self.active_fig][5]=min
+            #self.fig_dict[self.active_fig][1].set_clim([min,max])
+            self.fig_dict['orig. image'][4]=max
+            self.fig_dict['orig. image'][5]=min
+            self.fig_dict['orig. image'][1].set_clim([min,max])
             self.canvas.draw()
     def dsb_max_handl(self):
         max = float(self.dsb_max.text())
