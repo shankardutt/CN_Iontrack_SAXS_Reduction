@@ -300,11 +300,16 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
 #            ax1f4.plot(chi,np.power(I2d,0.2))
             ax1f4.plot(chi,I2d)
             self.addfig('1d sub', [fig4,None])
+            fig5= Figure()
+            ax1f5 = fig5.add_subplot(111)
+            ax1f5.plot(abschi,np.power(I2d,0.2))
+            self.addfig('1d sub |q|', [fig5,None])
             if self.cb_logscale.isChecked():
 #                im1.set_norm(mpl.colors.LogNorm())
                 ax1f2.set_yscale('log')
                 ax1f3.set_yscale('log')
                 ax1f4.set_yscale('log')
+                ax1f5.set_yscale('log')
             self.rmmpl()
             self.addmpl(self.fig_dict['orig. image'])
             self.active_fig='orig. image'
@@ -373,6 +378,16 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                     abschi,chi,I2d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
                     I2d[I2d<=0]=1
                     pchi=chi
+                    pI=I1d-I2d
+                    pI_err=I1d*0
+                elif self.active_fig == '1d sub |q|':
+                    fig = self.fig_dict['1d sub |q|'][0]
+                    abschi,chi,I1d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+                    I1d[I1d<=0]=1
+                    alpha+=float(self.dsb_bkg_angle.text())
+                    abschi,chi,I2d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
+                    I2d[I2d<=0]=1
+                    pchi=abschi
                     pI=I1d-I2d
                     pI_err=I1d*0
                 #ax1 = fig.add_subplot(111)
