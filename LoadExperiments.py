@@ -55,7 +55,13 @@ class scatterBrainRead:
 
                         self.dictionary["dist"]=float(camera_defs.get('LENGTH'))*1e-3
                         self.dictionary["Beam_x"]=float(camera_defs.get('BEAMX'))
-                        self.dictionary["Beam_y"]=float(1679)-float(camera_defs.get('BEAMY'))
+                        if camera_defs.get('DETECTOR') == 'Pilatus 2M':
+                            self.dictionary["Beam_y"]=float(1679)-float(camera_defs.get('BEAMY'))
+                        elif camera_defs.get('DETECTOR') == 'Pilatus 1M':
+                            self.dictionary["Beam_y"]=float(1043)-float(camera_defs.get('BEAMY'))
+                        else:
+                            print('Detector not defined!')
+                            self.dictionary["Beam_y"]=float(camera_defs.get('BEAMY'))
 #                        self.dictionary['energy_wavelength_box']=0
 #                        self.dictionary['energy_wavelength']=12.3984/float(camera_defs.get('WAVELENGTH'))
                         self.dictionary["energy"]=12.3984/float(camera_defs.get('WAVELENGTH'))
@@ -102,3 +108,10 @@ class LoadExperimet:
 #            print('load or find setting for file:'+ filename)
 #            self.loader.load_exp_file(filename)
 
+if __name__ == '__main__':
+    print('test')
+    dict = {}
+    dict["exp_path"] = '/data/tmp_AS/short.xml'
+    dict["exp_path"] = '/data/tmp_AS/30_AS/Experiment1.xml'
+    loader=scatterBrainRead(dict)
+    print(loader.get_experiment())
