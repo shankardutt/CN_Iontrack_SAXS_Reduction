@@ -233,8 +233,8 @@ def fit_circ_pyFAI(img,gamma,alpha,width,config,mask_img=None):
     alpha0=180-alpha
 
     ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(dist=config["dist"], pixel1=config["pixel1"], pixel2=config["pixel2"],poni1=p1,poni2=p2)
-    
-    if alpha <= dalpha or alpha > (360 - dalpha):
+    #print('alpha=%f, dalpha=%f' % (np.radians(alpha),np.radians(dalpha)))
+    if alpha <= dalpha_max or alpha > (360 - dalpha_max):
         ai.setChiDiscAtZero()
     else:
         ai.setChiDiscAtPi()
@@ -282,7 +282,8 @@ def fit_circ_pyFAI(img,gamma,alpha,width,config,mask_img=None):
 # Constrain the optimization to the region of ``0 < a < 3``, ``0 < b < 2`` and ``0 < c < 1``:
 #popt, pcov = curve_fit(func, xdata, ydata, bounds=(0, [3., 2., 1.]))
     popt, pcov = curve_fit(func_lin, dy, dx)
-    print(np.degrees(popt[0]))
+    #print(np.degrees(popt[0]))
+    #print(popt)
     return np.degrees(np.arcsin(popt[0])),gamma,k,qpix
 
 
