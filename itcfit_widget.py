@@ -455,9 +455,14 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         fit_r_range=self.config['d_radius']*self.config['pixel1']*1e+3
         while abs(alpha_corr) > fit_tol and i < max_iter:
             alpha_corr,gamma,k,qpix=fit_circ_pyFAI(img,gamma,alpha,fit_r_range,self.config,self.bs_mask)
+            
             alpha+=alpha_corr*self.config['damping']
+            if alpha_corr == 90:
+                print('error while fitting')
+                i = max_iter
             print ("a=",alpha_corr)
-            print ("d=",self.config['damping'])
+            #print ("al=",alpha)
+            #print ("d=",self.config['damping'])
             print ("i=",i)
             i+=1
         
