@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
+    <width>387</width>
     <height>300</height>
    </rect>
   </property>
@@ -47,12 +47,12 @@
     <rect>
      <x>145</x>
      <y>20</y>
-     <width>126</width>
+     <width>151</width>
      <height>18</height>
     </rect>
    </property>
    <property name="text">
-    <string>Wavelength (nm)</string>
+    <string>Wavelength (A)</string>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="dsb_Energy">

@@ -92,7 +92,8 @@ class DetectorParams(QMainWindow, QDialog):
         if self.energy_state != btn.text():
             self.energy_state=btn.text()
             self.e_label.setText(btn.text())
-            if btn.text() == "Wavelength (nm)":
+
+            if btn.text() == 'Wavelength (A)':
                 self.dsb_Energy.setValue(12.345/self.energy)
             else:
                 self.dsb_Energy.setValue(self.energy)
