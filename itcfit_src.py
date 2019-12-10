@@ -188,7 +188,22 @@ def do_integration1d(img,alpha,gamma,config,k,qpix,mask=None):
         else:
             chi1[i]=abschi[i]
     column = 0 #np.argmin(np.abs(tth1-d0))
-    return abschi,chi1,I1[:,column],sig1[:,column]
+    I1c = I1[:,column]
+    sig1c = sig1[:,column]
+    chi1c = chi1
+    abschic = abschi
+    if chi1[0] > 0:
+        I1c = np.flip(I1[:,column])
+        sig1c =  np.flip(sig1[:,column])
+        chi1c =  np.flip(chi1)
+        abschic =  np.flip(abschi)
+
+    #print(alpha)
+    #print(alpha0)
+    #print(chi1c[0])
+    #print(chi1c[-1])
+    
+    return abschic,chi1c,I1c,sig1c
 
 
 def func_lin(x, a, b):
