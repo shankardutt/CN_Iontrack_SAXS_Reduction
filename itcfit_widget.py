@@ -220,7 +220,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             if '.tif' not in self.file_path:
                 img = fabio.edfimage.EdfImage()
                 img.read(self.file_path)
-                self.img_orig = np.copy(img.getData(),'float64')
+                self.img_orig = np.copy(img.data)#,'float64')
             else:
                 self.img_orig=np.array(Image.open(self.file_path))
             
@@ -416,7 +416,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 if '.tif' not in self.file_path:
                     img = fabio.edfimage.EdfImage()
                     img.read(self.file_path)
-                    self.img_orig = np.copy(img.getData(),'float64')
+                    self.img_orig = np.copy(img.data)#,'float64')
                 else:
                     self.img_orig=np.array(Image.open(self.file_path))
                 self.img=np.copy(self.img_orig)
