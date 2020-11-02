@@ -1,3 +1,7 @@
+# some of my stuff
+*.xy
+*.poni
+
 # Byte-compiled / optimized / DLL files
 *~
 __pycache__/
