@@ -37,6 +37,7 @@ from PyQt5 import QtGui, QtCore, uic, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtCore import *
+import pyFAI.units
 
 def get_ui_file_ITC(filename):
     """get the full path of a user-interface file
@@ -94,7 +95,7 @@ class DetectorParams(QMainWindow, QDialog):
             self.e_label.setText(btn.text())
 
             if btn.text() == 'Wavelength (A)':
-                self.dsb_Energy.setValue(12.345/self.energy)
+                self.dsb_Energy.setValue(pyFAI.units.hc/self.energy)
             else:
                 self.dsb_Energy.setValue(self.energy)
     # get current date and time from the dialog
