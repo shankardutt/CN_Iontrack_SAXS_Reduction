@@ -1,3 +1,6 @@
+## 0.7.1 (December 14, 2020)
+
+
 ## 0.1.0 (December 14, 2020)
   - changed the range of the alpha spin box
   - replaced conversion constant for energy wavelenght conversion to pyFAI hc
