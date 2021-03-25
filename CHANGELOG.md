@@ -1,3 +1,7 @@
+## 0.7.2 (March 25, 2021)
+  - removed a warning from numexpr
+  - changed the way scaling is done
+
 ## 0.7.1 (December 14, 2020)
 
 
