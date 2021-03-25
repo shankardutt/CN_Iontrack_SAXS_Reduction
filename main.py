@@ -35,6 +35,9 @@ __status__ = "development"
 pyITCfit_version = "0.6.0"
 pyITCfit_date = "05/06/2019"
 
+import numexpr as ne
+ne.set_num_threads(1)
+
 import sys, logging, json, os, time, types, threading
 import os.path
 import numpy
