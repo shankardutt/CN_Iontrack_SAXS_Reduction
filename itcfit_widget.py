@@ -67,19 +67,24 @@ def get_ui_file_ITC(filename):
     return os.path.join(".", filename)
 #    return _get_data_path_ITC(os.path.join("gui", filename))
 
-UIC = get_ui_file_ITC("ITCfit_view.ui")
+UIC = get_ui_file_ITC("ITCfit_view_abs.ui")
 
 Ui_MainWindow, QMainWindow = loadUiType(UIC)
 
-def imsc(img):
-    scale = 1#e5#/img.max()
-    return np.power(img,1)*scale
+def imsc(img,i_scale,i_exp):
+    #scale = 100#e5#/img.max()
+    #return np.log(img)*scale
+    if i_exp < 1:
+        img[img<0]=0
+    return np.power(img,i_exp)*i_scale
 
 class MainITCfit(QMainWindow, Ui_MainWindow):
     def __init__(self,file_path_=None,exp_path_=None,outpath_=None,json_file=None,cakeit=False,_mask_file=None):
         super(MainITCfit,self).__init__()
         self.setupUi(self)
         self.imsc = imsc
+        self.im_scale = 1
+        self.im_exp = 1
         self.cakeit=cakeit
         self.json_file=json_file
         self.fig_dict = {}
@@ -98,11 +103,11 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.bs_mask=None
         self.mask_file=_mask_file
         self.Ibs = 1
-        #self.Absscale = 1/0.03078362722368851
-        #self.Absscale = 1/0.018774281015716697
-        self.Absscale = 1 #/0.007099958798999592
-        #self.Absscale = 1/0.031619
+        self.Absscale = 0
         default_dict={
+                        "im_scale": 1,
+                        "im_exp": 1,
+                        "abs": 0,
                         "dist": 1.0,
                         "energy": 12.0,
                         "c_max_s": 1000.0,
@@ -186,7 +191,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         print ("exp_path: ",self.exp_path)
 
         self.k,self.qpix = qr_conv(self.config)
-        self.phis=np.arange(0,6.3,0.01)
+        self.phis=np.arange(0,6.3,0.001)
 
         self.exp_cb.addItem("ScatterBrain")
         self.exp_cb.addItem("pyFAI")
@@ -194,6 +199,8 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.cb_logscale.setChecked(True)
         self.cb_logscale.stateChanged.connect(self.update_view)
         self.cb_log_x_scale.stateChanged.connect(self.update_view)
+        self.dsb_scale.valueChanged.connect(self.update_view)
+        self.dsb_exp.valueChanged.connect(self.update_view)
         self.dsb_alpha.valueChanged.connect(self.update_view)
         self.dsb_gamma.valueChanged.connect(self.update_view)
         self.dsb_bkg_angle.editingFinished.connect(self.update_view)
@@ -216,6 +223,9 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.save_as_btn.pressed.connect(self.save_as_config)
         self.sub_folder_cb.stateChanged.connect(self.sub_folder_cb_handl)
         self.qexp_path.setEnabled(False)
+
+        self.dsb_abs.editingFinished.connect(self.update_abs)
+        
         fig = Figure()
         self.addmpl((fig,None))
         if self.exp_path:
@@ -228,31 +238,39 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             if '.tif' not in self.file_path:
                 img = fabio.edfimage.EdfImage()
                 img.read(self.file_path)
+                
                 try:
-                    self.Ibs = 1 #float(img.header['Ibs'])
+                    self.Ibs = float(img.header['Ibs'])
                 except:
                     self.Ibs=1
-                    #self.img_orig = np.copy(img.data)#,'float64')
                 if self.Ibs < 1:
                     self.Ibs=1
-                self.img_orig = np.copy(img.data/self.Ibs*self.Absscale)#,'float64')
+                self.img_orig = np.copy(img.data)
                 #img = img.next()
-                #self.img_orig = np.copy(img.data)
-                print('scale=',self.Absscale/self.Ibs)
+                #self.img_orig = np.copy(img.data*self.Absscale/self.Ibs)
+                #print('scale=',self.Absscale/self.Ibs)
                 #print('scale=',self.Ibs)
             else:
                 self.img_orig=np.array(Image.open(self.file_path))
-            
-            self.img=np.copy(self.img_orig)
+                
+            #if  self.Absscale > 0:
+            #    self.img = np.copy(self.img_orig/self.Ibs*self.Absscale)#,'float64')
+            #else:
+            #    self.img=np.copy(self.img_orig)
+            #self.update_view()
+            self.update_abs()
             self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=self.mask_file)
             self.img[self.bs_mask > 0]=-1
-            self.update_view()
         if self.outpath:
             self.sub_folder_path.setText(self.outpath)
         self.exp_cb.setCurrentIndex(self.exp_load)
         self.sub_folder_cb_handl()
 
     def hide_fit(self):
+        self.label_14.hide()
+        self.dsb_abs.hide()
+        self.dsb_abs.setValue(0)
+        self.Absscale=0
         self.dsb_fit_q_max.hide()
         self.label_4.hide()
         self.dsb_fit_q_min.hide()
@@ -266,8 +284,21 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.dsb_d_radius.hide()
         self.label_12.hide()                
         self.fit_it_btn.hide()
+        self.update_abs()
+        
+    def update_abs(self):
+        self.Absscale = float(self.dsb_abs.text())
+        if  self.Absscale > 0:
+            self.img = np.copy(self.img_orig/self.Ibs*self.Absscale)#,'float64')
+        else:
+            self.img=np.copy(self.img_orig)
+        self.update_view()
         
     def update_view(self):
+        self.im_scale = float(self.dsb_scale.text())
+        self.im_exp = float(self.dsb_exp.text())
+        self.imsc = imsc
+        #print(self.im_scale)
         alpha = float(self.dsb_alpha.text())
         self.dsb_alpha.setValue(alpha%360)
         self.k,self.qpix = qr_conv(self.config)
@@ -277,7 +308,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             ax1f1 = fig1.add_subplot(111)
             self.subp=ax1f1
             #im1=ax1f1.imshow(np.power(self.img,1),zorder=1,cmap=self.cmap)
-            im1=ax1f1.imshow(self.imsc(self.img),zorder=1,cmap=self.cmap)
+            im1=ax1f1.imshow(self.imsc(self.img,self.im_scale,self.im_exp),zorder=1,cmap=self.cmap)
             fig1.colorbar(im1)
             ax=ax1f1.axis()
             im_w,im_h=self.img.shape
@@ -302,7 +333,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
             if self.cakeit:
                 fig5  = Figure()
                 ax1f5 = fig5.add_subplot(111)
-                im5=ax1f5.imshow(self.imsc(self.img),zorder=1)
+                im5=ax1f5.imshow(self.imsc(self.img,self.im_scale,self.im_exp),zorder=1)
                 self.addfig('cake', [fig5,im5,float(self.config["c_max"]),float(self.config["c_min"]),float(self.config["c_max_s"]),float(self.config["c_min_s"])])
             abschi,chi,I1d,_ = do_integration1d(self.img,alpha,gamma,self.config,self.k,self.qpix,self.bs_mask)
             I1d[I1d<0]=1
@@ -341,6 +372,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 gamma = float(self.dsb_gamma.text())
                 fig=self.fig_dict['orig. image'][0]
                 im=self.fig_dict['orig. image'][1]
+                im.set_data(self.imsc(self.img,self.im_scale,self.im_exp))
 #                print(im.get_extent())
 #                print(self.img.shape)
 #                im.set_extent((-0.5,self.img.shape[1]-0.5,self.img.shape[0]-0.5,-0.5))
@@ -439,26 +471,28 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                     img = fabio.edfimage.EdfImage()
                     img.read(self.file_path)
                     try:
-                        self.Ibs = 1 #float(img.header['Ibs'])
+                        self.Ibs = float(img.header['Ibs'])
                     except:
                         self.Ibs=1
                         #self.img_orig = np.copy(img.data)#,'float64')
                     if self.Ibs < 1:
                         self.Ibs=1
-
-                    self.img_orig = np.copy(img.data/self.Ibs*self.Absscale)#,'float64')
-
-                    print(self.Ibs)
+                    self.img_orig = np.copy(img.data)
+                    #print(self.Ibs)
                     #img = img.next()
                     
                 else:
                     self.img_orig=np.array(Image.open(self.file_path))
-                self.img=np.copy(self.img_orig)
+                
+                if  self.Absscale > 0:
+                    self.img = np.copy(self.img_orig/self.Ibs*self.Absscale)#,'float64')
+                else:
+                    self.img=np.copy(self.img_orig)
 #                self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),self.mask_file)
                 self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=self.mask_file)
                 self.img[self.bs_mask > 0]=-1
                 if self.active_fig is not None:
-                    self.fig_dict['orig. image'][1].set_data(self.imsc(self.img))
+                    self.fig_dict['orig. image'][1].set_data(self.imsc(self.img,self.im_scale,self.im_exp))
                     #self.fig_dict['orig. image'][0].gca().set_autoscale_on(True)
                     self.fig_dict['orig. image'][1].set_extent((-0.5,self.img.shape[1]-0.5,self.img.shape[0]-0.5,-0.5))
                     self.fig_dict['orig. image'][0].gca().set_autoscale_on(False)
@@ -525,6 +559,8 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         """
         self.config=dico
         setup_data = {
+                    "im_scale": self.dsb_scale.setValue,
+                    "im_exp": self.dsb_exp.setValue,
                     "exp_load": lambda a: self.exp_load_set(a),
                     "exp_path": self.qexp_path.setText,
                     "file_path": self.qfile_path.setText,
@@ -542,7 +578,8 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                     "bkg_angle": self.dsb_bkg_angle.setValue,
                     "d_radius": self.dsb_d_radius.setValue,
                     "c_min": self.dsb_min.setValue,
-                    "c_max": self.dsb_max.setValue
+                    "c_max": self.dsb_max.setValue,
+                    "abs": self.dsb_abs.setValue  
 #                    "c_max_s": self.slider_max.setValue,
 #                    "c_min_s": self.slider_min.setValue
                     #"poni": self.poni.setText,
@@ -673,6 +710,7 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.config["c_min"]=float(self.dsb_min.text())
         self.config["c_max_s"]=float(self.slider_max.value())
         self.config["c_min_s"]=float(self.slider_min.value())
+        self.config["abs"] = float(self.dsb_abs.text())
 #        to_save = {
 #                "poni": str_(self.poni.text()).strip(),
 #                "detector": str_(self.detector.currentText()).lower(),
@@ -767,12 +805,15 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.exp_path=exp_path # do this only if success
         self.k,self.qpix = qr_conv(self.config)
         if self.img_orig is not None:
-            self.img=np.copy(self.img_orig)
+            if  self.Absscale > 0:
+                self.img = np.copy(self.img_orig/self.Ibs*self.Absscale)#,'float64')
+            else:
+                self.img=np.copy(self.img_orig)
             self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=self.mask_file)
             #beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),mask_file=self.mask_file)
             self.img[self.bs_mask > 0]=-1
             if self.active_fig is not None:
-                self.fig_dict['orig. image'][1].set_data(self.imsc(self.img))
+                self.fig_dict['orig. image'][1].set_data(self.imsc(self.img,self.im_scale,self.im_exp))
 
     def mask_btn_handl(self):
         if self.img_orig is not None:
@@ -781,12 +822,15 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
     def set_mask(self,mask):
         self.pyFAI_mask = np.copy(mask)
         if self.img_orig is not None:
-            self.img=np.copy(self.img_orig)
+            if  self.Absscale > 0:
+                self.img = np.copy(self.img_orig/self.Ibs*self.Absscale)#,'float64')
+            else:
+                self.img=np.copy(self.img_orig)
             self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=None,pyFAI_mask=self.pyFAI_mask)
 
             self.img[self.bs_mask > 0]=-1
             if self.active_fig is not None:
-                self.fig_dict['orig. image'][1].set_data(self.imsc(self.img))
+                self.fig_dict['orig. image'][1].set_data(self.imsc(self.img,self.im_scale,self.im_exp))
         self.update_view()
 
     def exp_btn_handl(self):
@@ -809,12 +853,17 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 self.exp_path=None
         if self.img_orig is None:
             return
-        self.img=np.copy(self.img_orig)
+        
+        if  self.Absscale > 0:
+            self.img = np.copy(self.img_orig/self.Ibs*self.Absscale)#,'float64')
+        else:
+            self.img=np.copy(self.img_orig)
+
         self.bs_mask = beam_stop_threshold_mask(self.img,self.img.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),bsc_size=float(self.config["Bsc_size"]),bs_alpha=float(self.config["Bs_alpha"]),bs_w2=float(self.config["Bs_w2"]),bs_l1=float(self.config["Bs_l1"]),bs_l2=float(self.config["Bs_l2"]),bs_x_off=float(self.config["Bs_x_off"]),bs_y_off=float(self.config["Bs_y_off"]),mask_file=self.mask_file)
         #beam_stop_threshold_mask(self.img,self.img_orig.max()-10,0,float(self.config["Beam_x"]),float(self.config["Beam_y"]),mask_file=self.mask_file)
         self.img[self.bs_mask > 0]=-1
         if self.active_fig is not None:
-            self.fig_dict['orig. image'][1].set_data(self.imsc(self.img))
+            self.fig_dict['orig. image'][1].set_data(self.imsc(self.img,self.im_scale,self.im_exp))
         self.update_view()
     def exp_cb_change(self,i):
         self.exp_load=i
@@ -866,8 +915,14 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         self.slider_max.setRange(min,max)
     def btn_reset_handl(self):
         if self.active_fig and self.fig_dict[self.active_fig][1]:
-            max=self.imsc(self.img).max()
-            min=self.imsc(self.img).min()
+            max=self.imsc(self.img,self.im_scale,self.im_exp).max()
+            min=self.imsc(self.img,self.im_scale,self.im_exp).min()
+            if np.isnan(max):
+                max = 1
+            if np.isnan(min):
+                min=0
+            min = int(min)
+            max = int(max)
             self.dsb_max.setValue(max)
             self.dsb_min.setValue(min)
             self.slider_min.setRange(min,max)
