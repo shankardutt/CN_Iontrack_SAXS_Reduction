@@ -377,10 +377,19 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
 #                print(self.img.shape)
 #                im.set_extent((-0.5,self.img.shape[1]-0.5,self.img.shape[0]-0.5,-0.5))
 #                print(im.get_extent())
-                self.subp.lines.pop(0)
-                self.subp.lines.pop(0)
-                self.subp.lines.pop(0)
-                self.subp.lines.pop(0)
+                
+                line_to_remove = self.subp.lines[0]  
+                line_to_remove.remove()  
+                line_to_remove = self.subp.lines[0]  
+                line_to_remove.remove()  
+                line_to_remove = self.subp.lines[0]  
+                line_to_remove.remove()  
+                line_to_remove = self.subp.lines[0]  
+                line_to_remove.remove()  
+                # self.subp.lines.pop(0)
+                # self.subp.lines.pop(0)
+                # self.subp.lines.pop(0)
+                # self.subp.lines.pop(0)
                 
                 ax=self.subp.axis()
                 
@@ -447,7 +456,10 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
                 #ax1 = fig.add_subplot(111)
                 ax1 = fig.gca()
                 
-                ax1.lines.pop(0)
+                #ax1.lines.pop(0)
+                line_to_remove = ax1.lines[0]  
+                line_to_remove.remove()  
+                
                 #                ax1.plot(pchi,np.power(pI,0.2),c='b')
                 ax1.plot(pchi,pI,c='b')
                 #ax1.errorbar(pchi,pI,yerr=pI_err, fmt='o',c='b')
@@ -898,8 +910,8 @@ class MainITCfit(QMainWindow, Ui_MainWindow):
         if curr_min > max:
             curr_min=max*0.5
             self.slider_min.setValue(curr_min)
-        self.slider_min.setRange(min,max)
-        self.slider_max.setRange(min,max)
+        self.slider_min.setRange(int(min),int(max))
+        self.slider_max.setRange(int(min),int(max))
     def dsb_min_handl(self):
         max = float(self.dsb_max.text())
         min = float(self.dsb_min.text())
